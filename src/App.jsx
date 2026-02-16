@@ -21,8 +21,15 @@ function App() {
       return;
     }
 
+    if (!apiKey.trim() || !apiKey.startsWith('sk-ant-')) {
+      alert('❌ API Key inválida. Debe empezar con sk-ant-');
+      return;
+    }
+
     setIsLoading(true);
     try {
+      console.log('Llamando a Anthropic API...');
+      
       const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -65,7 +72,17 @@ IMPORTANTE:
         })
       });
 
+      console.log('Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('API Error:', errorData);
+        throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+      }
+
       const data = await response.json();
+      console.log('Response recibida:', data);
+      
       const content = data.content[0].text;
       const jsonMatch = content.match(/\{[\s\S]*\}/);
       
@@ -74,9 +91,21 @@ IMPORTANTE:
         setPersonas(parsed.personas);
         setStep('interview');
         startInterview(0, parsed.personas);
+      } else {
+        throw new Error('No se pudo parsear la respuesta JSON');
       }
     } catch (error) {
-      alert('Error generando personas: ' + error.message);
+      console.error('Error completo:', error);
+      
+      if (error.message.includes('Failed to fetch')) {
+        alert('❌ Error de conexión. Verifica:\n\n1. Tu API key es correcta\n2. Tienes conexión a internet\n3. Tu navegador permite peticiones a api.anthropic.com\n\nPrueba en modo incógnito o con otro navegador.');
+      } else if (error.message.includes('401')) {
+        alert('❌ API Key inválida o expirada. Genera una nueva en console.anthropic.com');
+      } else if (error.message.includes('429')) {
+        alert('❌ Límite de peticiones excedido. Espera un minuto e intenta de nuevo.');
+      } else {
+        alert('❌ Error: ' + error.message);
+      }
     }
     setIsLoading(false);
   };
