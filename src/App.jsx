@@ -28,17 +28,15 @@ function App() {
 
     setIsLoading(true);
     try {
-      console.log('Llamando a Anthropic API...');
+      console.log('Generando personas...');
       
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          apiKey: apiKey,
           max_tokens: 2000,
           messages: [{
             role: 'user',
@@ -81,7 +79,7 @@ IMPORTANTE:
       }
 
       const data = await response.json();
-      console.log('Response recibida:', data);
+      console.log('Response recibida');
       
       const content = data.content[0].text;
       const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -98,7 +96,7 @@ IMPORTANTE:
       console.error('Error completo:', error);
       
       if (error.message.includes('Failed to fetch')) {
-        alert('❌ Error de conexión. Verifica:\n\n1. Tu API key es correcta\n2. Tienes conexión a internet\n3. Tu navegador permite peticiones a api.anthropic.com\n\nPrueba en modo incógnito o con otro navegador.');
+        alert('❌ Error de conexión. Verifica tu conexión a internet.');
       } else if (error.message.includes('401')) {
         alert('❌ API Key inválida o expirada. Genera una nueva en console.anthropic.com');
       } else if (error.message.includes('429')) {
@@ -184,15 +182,13 @@ El entrevistador te va a hacer preguntas. Responde como esta persona responderí
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          apiKey: apiKey,
           max_tokens: 500,
           system: newMessages[0].content,
           messages: newMessages.slice(1).map(m => ({
@@ -239,15 +235,13 @@ El entrevistador te va a hacer preguntas. Responde como esta persona responderí
   const generateAnalysis = async (interviewsData) => {
     setIsLoading(true);
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('/api/anthropic', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version': '2023-06-01'
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          apiKey: apiKey,
           max_tokens: 3000,
           messages: [{
             role: 'user',
