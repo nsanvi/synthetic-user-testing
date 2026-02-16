@@ -72,14 +72,22 @@ IMPORTANTE:
 
       console.log('Response status:', response.status);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error('API Error:', errorData);
-        throw new Error(`API Error: ${errorData.error?.message || response.statusText}`);
+      // Intentar leer como texto primero para debug
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (e) {
+        console.error('No se pudo parsear como JSON:', responseText);
+        throw new Error('Respuesta inválida del servidor: ' + responseText.substring(0, 100));
       }
 
-      const data = await response.json();
-      console.log('Response recibida');
+      if (!response.ok) {
+        console.error('API Error:', data);
+        throw new Error(`API Error: ${data.error?.message || data.error || response.statusText}`);
+      }
       
       const content = data.content[0].text;
       const jsonMatch = content.match(/\{[\s\S]*\}/);
@@ -97,10 +105,12 @@ IMPORTANTE:
       
       if (error.message.includes('Failed to fetch')) {
         alert('❌ Error de conexión. Verifica tu conexión a internet.');
-      } else if (error.message.includes('401')) {
+      } else if (error.message.includes('401') || error.message.includes('authentication')) {
         alert('❌ API Key inválida o expirada. Genera una nueva en console.anthropic.com');
       } else if (error.message.includes('429')) {
         alert('❌ Límite de peticiones excedido. Espera un minuto e intenta de nuevo.');
+      } else if (error.message.includes('credit balance')) {
+        alert('❌ Sin créditos. Ve a console.anthropic.com/settings/billing para añadir créditos.');
       } else {
         alert('❌ Error: ' + error.message);
       }
