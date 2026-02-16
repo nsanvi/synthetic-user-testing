@@ -37,35 +37,31 @@ function App() {
         },
         body: JSON.stringify({
           apiKey: apiKey,
-          max_tokens: 2000,
+          max_tokens: 1000,
           messages: [{
             role: 'user',
-            content: `Genera exactamente 5 personas diversas para validar esta startup idea:
+            content: `Genera 3 personas diversas para validar esta idea:
 
 IDEA: ${startupIdea}
-SEGMENTO OBJETIVO: ${targetSegment}
+SEGMENTO: ${targetSegment}
 
-Para cada persona, devuelve un JSON con esta estructura:
+Responde SOLO con este JSON (sin texto extra):
 {
   "personas": [
     {
-      "nombre": "nombre ficticio",
+      "nombre": "nombre",
       "edad": número,
       "profesion": "profesión",
-      "contexto": "breve descripción de su situación vital y profesional",
-      "job_to_be_done": "qué trabajo/problema necesita resolver (no mencionar la startup)",
+      "contexto": "situación breve (max 1 línea)",
+      "job_to_be_done": "problema real que tiene",
       "objeciones_probables": ["objeción 1", "objeción 2"],
       "nivel_dolor": "alto/medio/bajo",
-      "personalidad": "breve descripción de cómo se comportaría en una entrevista"
+      "personalidad": "cómo se comporta en entrevistas"
     }
   ]
 }
 
-IMPORTANTE: 
-- Haz las personas REALISTAS y DIVERSAS (diferentes niveles de dolor, contextos, objeciones)
-- Al menos 1 persona debe ser escéptica o tener bajo nivel de dolor
-- NO inventes que conocen o necesitan la solución, describe sus problemas reales
-- Responde SOLO con el JSON, sin texto adicional`
+Importante: 1 persona con alto dolor, 1 medio, 1 escéptica/bajo.`
           }]
         })
       });
@@ -318,7 +314,7 @@ Responde SOLO con el JSON.`
             Synthetic User Testing
           </h1>
           <p className="text-gray-600 text-lg">
-            Valida tu startup antes de invertir en entrevistas reales
+            Valida tu startup con 3 entrevistas sintéticas antes de invertir en discovery real
           </p>
         </header>
 
@@ -379,7 +375,7 @@ Responde SOLO con el JSON.`
               >
                 {isLoading ? 'Generando personas...' : (
                   <>
-                    Generar 5 personas <ArrowRight size={20} />
+                    Generar 3 personas <ArrowRight size={20} />
                   </>
                 )}
               </button>
@@ -391,7 +387,7 @@ Responde SOLO con el JSON.`
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6">
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold">Entrevista {currentPersona + 1}/5</h2>
+                <h2 className="text-xl font-bold">Entrevista {currentPersona + 1}/3</h2>
                 <span className="text-sm text-gray-500">
                   {personas[currentPersona].nombre}
                 </span>
